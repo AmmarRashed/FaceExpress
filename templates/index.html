@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles/index.css">
+    <script src="scripts/index.js"></script>
     <title>Facial Expression Analyzer</title>
 </head>
 <body>
     <div id="stream-div">
-        <img src="{{ url_for('video') }}" class="stream" alt="stream"/>
+        <img id="stream-frame" alt="stream"/>
+        <h4 id="dominant-emotion"></h4>
     </div>
 </body>
 </html>

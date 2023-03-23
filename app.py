@@ -1,6 +1,6 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, jsonify
 
-from scripts.feed import get_webcam_feed
+from utils.feed import get_webcam_feed
 
 app = Flask(__name__)
 
@@ -12,7 +12,9 @@ def index():  # put application's code here
 
 @app.route("/video")
 def video():
-    return Response(get_webcam_feed(), mimetype="multipart/x-mixed-replace; boundary=frame")
+    frame, emotion = get_webcam_feed()
+    # response = Response(frame, mimetype="multipart/x-mixed-replace; boundary=frame")
+    return jsonify({"frame": frame, "emotion": emotion})
 
 
 if __name__ == '__main__':

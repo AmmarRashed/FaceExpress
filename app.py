@@ -1,8 +1,10 @@
 from flask import Flask, render_template, Response, jsonify
 
-from utils.feed import get_webcam_feed
+from utils.feed import FrameGenerator
 
 app = Flask(__name__)
+
+frame_generator = FrameGenerator(analyze_face=True)
 
 
 @app.route('/')
@@ -10,11 +12,10 @@ def index():  # put application's code here
     return render_template("index.html")
 
 
-@app.route("/video")
-def video():
-    frame, emotion = get_webcam_feed()
-    # response = Response(frame, mimetype="multipart/x-mixed-replace; boundary=frame")
-    return jsonify({"frame": frame, "emotion": emotion})
+@app.route("/webcam")
+def webcam():
+    frame_data = frame_generator.gen_frames().__next__()
+    return jsonify(frame_data)
 
 
 if __name__ == '__main__':

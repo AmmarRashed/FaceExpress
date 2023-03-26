@@ -1,3 +1,5 @@
+import base64
+
 import cv2
 
 from utils.facial_analysis import analyze_face
@@ -18,15 +20,25 @@ def add_facial_analysis(frame):
     return frame, emotion
 
 
-def get_webcam_feed():
-    while True:
-        success, frame = camera.read()
-        if not success:
-            continue
-        else:
-            frame, emotion = add_facial_analysis(frame)
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
+def encode_frame(frame):
+    ret, buffer = cv2.imencode('.jpg', frame)
+    frame_str = base64.b64encode(buffer).decode('utf-8')
+    return frame_str
 
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'), emotion
+
+class FrameGenerator(object):
+    def __init__(self, analyze_face=True):
+        self.analyze_face = analyze_face
+
+    def gen_frames(self):
+        while True:
+            success, frame = camera.read()
+            if not success:
+                continue
+            else:
+                data = {}
+                if self.analyze_face:
+                    frame, emotions = add_facial_analysis(frame)
+                    data["emotions"] = emotions
+                data["frame"] = encode_frame(frame)
+                yield data

@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles/index.css">
-    <script src="scripts/index.js"></script>
+    <link rel="stylesheet" href="static/styles/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Facial Expression Analyzer</title>
 </head>
 <body>
-    <div id="stream-div">
-        <img id="stream-frame" alt="stream"/>
-        <h4 id="dominant-emotion"></h4>
-    </div>
+<div id="stream-div">
+    <img id="webcam-feed">
+
+</div>
+<div id="emotion">
+</div>
+
+<script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>

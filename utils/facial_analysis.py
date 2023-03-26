@@ -8,4 +8,4 @@ def analyze_face(img):
         return None, None
     else:
         data = obj[0]  # assuming there is only one face
-        return data["region"], data["dominant_emotion"]
+        return data["region"], data["emotion"]

@@ -2,3 +2,8 @@
     width: 500px;
     background-color: beige;
 }
+
+.emotion-gauge {
+    margin: auto;
+    width: 50px;
+}

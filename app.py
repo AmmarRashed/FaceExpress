@@ -1,10 +1,10 @@
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, jsonify
 
-from utils.feed import FrameGenerator
+from src.feed import FrameGenerator
 
 app = Flask(__name__)
 
-frame_generator = FrameGenerator(analyze_face=True)
+frame_generator = None
 
 
 @app.route('/')
@@ -14,6 +14,9 @@ def index():  # put application's code here
 
 @app.route("/webcam")
 def webcam():
+    global frame_generator
+    if frame_generator is None:
+        frame_generator = FrameGenerator(analyze_face=True)
     frame_data = frame_generator.gen_frames().__next__()
     return jsonify(frame_data)
 

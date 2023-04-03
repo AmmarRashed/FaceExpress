@@ -13,8 +13,9 @@ def analyze_face(img):
         return data["region"], data["emotion"]
 
 
-def add_facial_analysis(frame):
+def add_facial_analysis(frame, crop_face=True):
     region, emotion = analyze_face(frame)
+    face = None
     if region is not None:
-        frame = draw_face_box(frame, region)
-    return frame, emotion
+        frame, face = draw_face_box(frame, region, crop=crop_face)
+    return frame, face, emotion

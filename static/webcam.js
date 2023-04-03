@@ -1,7 +1,9 @@
-var webcam_feed = document.getElementById("webcam-feed");
-var emotion_div = document.getElementById("emotion-div");
-var pause_btn = document.getElementById("pause-btn");
-var pause_state = false;
+const emotion_div = document.getElementById("emotion-div");
+const webcam_feed = document.getElementById("webcam-feed");
+const face = document.getElementById("face");
+const pause_btn = document.getElementById("pause-btn");
+let pause_state = false;
+let stream_interval;
 
 function displayEmotions(emotions) {
     emotion_div.innerHTML = "";
@@ -29,27 +31,36 @@ function displayEmotions(emotions) {
 }
 
 function get_frame() {
-    if (pause_state)
+    if (pause_state) {
+        console.log("Paused")
         return;
+    }
     $.ajax({
         type: 'GET',
-        url: '/webcam',
+        data: {'video_src': 0},
+        url: '/frames',
         success: function (response) {
             emotions = response.emotions;
             if (emotions) {
                 displayEmotions(emotions);
+                face.src = 'data:image/jpeg;base64,' + response.face;
             }
             webcam_feed.src = 'data:image/jpeg;base64,' + response.frame;
         },
     })
+
+    stream_interval = setTimeout(get_frame, 100);
 }
 
 function togglePause() {
     pause_state = !pause_state;
-    if (pause_state)
+    if (pause_state) {
         pause_btn.innerHTML = "Resume";
-    else
+        clearTimeout(stream_interval);
+    } else {
         pause_btn.innerHTML = "Pause";
+        stream_interval = setTimeout(get_frame, 100);
+    }
 }
 
-setInterval(get_frame, 50)
+get_frame();

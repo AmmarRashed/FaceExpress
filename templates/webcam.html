@@ -8,14 +8,17 @@
     <title>Facial Expression Analyzer</title>
 </head>
 <body>
+
+
 <div id="stream-div">
     <img id="webcam-feed">
-
+    <img id="face">
 </div>
 <button id="pause-btn" onclick="togglePause()">Pause</button>
+
 <div id="emotion-div">
 </div>
 
-<script src="{{ url_for('static', filename='index.js') }}"></script>
+<script src="{{ url_for('static', filename='webcam.js') }}"></script>
 </body>
 </html>

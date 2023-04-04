@@ -15,8 +15,11 @@
     <img id="face">
 </div>
 <button id="pause-btn" onclick="togglePause()">Pause</button>
-
-<div id="emotion-div">
+<div class="wrapper">
+    <div id="emotion-div" class="analysis_div">
+    </div>
+    <div id="val-arousal-div" class="analysis_div">
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='webcam.js') }}"></script>

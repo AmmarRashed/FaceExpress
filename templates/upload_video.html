@@ -14,7 +14,11 @@
     <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
     <img id="face">
 </div>
-<div id="emotion-div">
+<div class="wrapper">
+    <div id="emotion-div" class="analysis_div">
+    </div>
+    <div id="val-arousal-div" class="analysis_div">
+    </div>
 </div>
 </body>
 <script src="{{ url_for('static', filename='upload_video.js') }}"></script>

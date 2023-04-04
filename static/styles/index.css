@@ -1,4 +1,4 @@
-#webcam-feed #face{
+#webcam-feed #face {
     width: 500px;
     background-color: beige;
 }
@@ -6,4 +6,17 @@
 .emotion-gauge {
     margin: auto;
     width: 50px;
+}
+
+.wrapper {
+    white-space: nowrap;
+}
+
+.analysis_div {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    vertical-align: top;
+    box-sizing: border-box;
+    padding: 10px;
 }

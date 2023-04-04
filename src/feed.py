@@ -1,6 +1,6 @@
 import cv2
 
-from src.facial_analysis import add_facial_analysis
+from src.facial_analysis import analyze_face, detect_face
 from src.utils import encode_frame
 
 
@@ -16,10 +16,13 @@ class FrameGenerator(object):
             if not success:
                 continue
             else:
-                data = {}
+                data = {"frame": encode_frame(frame)}
+                face = detect_face(frame)
+                if face is None:
+                    yield data
+                    continue
+                data["face_img"] = encode_frame(face)
                 if self.analyze_face:
-                    frame, face, emotions = add_facial_analysis(frame)
-                    data["emotions"] = emotions
-                    data["face"] = encode_frame(face)
-                data["frame"] = encode_frame(frame)
+                    analysis = analyze_face(face)
+                    data.update(analysis)
                 yield data

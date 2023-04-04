@@ -2,9 +2,9 @@ import base64
 
 import cv2
 import numpy as np
-from flask import Flask, render_template, jsonify, request, Response
+from flask import Flask, render_template, jsonify, request
 
-from src.facial_analysis import add_facial_analysis
+from src.facial_analysis import facial_analysis_pipeline
 from src.feed import FrameGenerator
 from src.utils import encode_frame
 
@@ -30,16 +30,7 @@ def analyze_frame():
     # convert the decoded image to a numpy array using cv2
     image = np.frombuffer(img_bytes, np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
-    frame, face, emotions = add_facial_analysis(image)
-    try:
-        face = encode_frame(face)
-    except cv2.error:
-        face = ""
-    data = dict(
-        face=face,
-        emotions=emotions
-
-    )
+    data = facial_analysis_pipeline(image)
     return jsonify(data)
 
 

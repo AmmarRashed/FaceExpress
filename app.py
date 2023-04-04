@@ -1,6 +1,12 @@
+import base64
+
+import cv2
+import numpy as np
 from flask import Flask, render_template, jsonify, request
 
+from src.facial_analysis import add_facial_analysis
 from src.feed import FrameGenerator
+from src.utils import encode_frame
 
 app = Flask(__name__)
 
@@ -31,8 +37,17 @@ def video():
 @app.route("/analyze_frame", methods=["POST"])
 def analyze_frame():
     frame = request.json['frame']
-    print("Received frame")
-    return "Success"
+    img_bytes = base64.b64decode(frame.split(',')[1])
+    # convert the decoded image to a numpy array using cv2
+    image = np.frombuffer(img_bytes, np.uint8)
+    image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
+    frame, face, emotions = add_facial_analysis(image)
+    data = dict(
+        face=encode_frame(face),
+        emotions=emotions
+
+    )
+    return jsonify(data)
 
 
 @app.route("/frames")

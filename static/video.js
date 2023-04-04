@@ -38,20 +38,20 @@ function processFrame() {
     // get the current frame from the video
     ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
     const frame = canvas.toDataURL('image/jpeg', 0.8);
-    // do something with the frame here (e.g. send it to the server for processing)
-    // update the frame count and display it
     fetch('/analyze_frame', {
-      method: 'POST',
-      body: JSON.stringify({ frame: frame }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => {
-      console.log('Response:', response);
-    });
-
-    frameCount++;
-    console.log(`Processed frame ${frameCount}`);
+        method: 'POST',
+        body: JSON.stringify({frame: frame}),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+        .then(data => {
+            let emotions = data.emotions;
+            if (emotions) {
+                displayEmotions(emotions);
+                face.src = 'data:image/jpeg;base64,' + data.face;
+            }
+        });
     // continue processing frames
     window.requestAnimationFrame(processFrame);
 }

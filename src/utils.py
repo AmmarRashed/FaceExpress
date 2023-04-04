@@ -4,10 +4,7 @@ import cv2
 
 
 def encode_frame(frame):
-    try:
-        ret, buffer = cv2.imencode('.jpg', frame)
-    except cv2.error:
-        pass
+    ret, buffer = cv2.imencode('.jpg', frame)
     frame_str = base64.b64encode(buffer).decode('utf-8')
     return frame_str
 

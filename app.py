@@ -2,7 +2,7 @@ import base64
 
 import cv2
 import numpy as np
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Response
 
 from src.facial_analysis import add_facial_analysis
 from src.feed import FrameGenerator
@@ -18,21 +18,10 @@ def webcam():
     return render_template("webcam.html")
 
 
-@app.route('/video')
-def video():
-    return render_template("video.html")
+@app.route('/upload_video')
+def upload_video():
+    return render_template("upload_video.html")
 
-
-# @app.route('/', methods=['GET', 'POST'])
-# def upload_file():
-#     if request.method == 'POST':
-#         # handle file upload
-#         file = request.files['file']
-#         print(file)
-#         # do something with the file here
-#         return 'file uploaded successfully'
-#     # display the form
-#     return render_template('webcam.html')
 
 @app.route("/analyze_frame", methods=["POST"])
 def analyze_frame():
@@ -42,8 +31,12 @@ def analyze_frame():
     image = np.frombuffer(img_bytes, np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
     frame, face, emotions = add_facial_analysis(image)
+    try:
+        face = encode_frame(face)
+    except cv2.error:
+        face = ""
     data = dict(
-        face=encode_frame(face),
+        face=face,
         emotions=emotions
 
     )

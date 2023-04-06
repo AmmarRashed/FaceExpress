@@ -16,19 +16,32 @@ face_detector = cv2.dnn.readNetFromCaffe(os.path.join("models", 'deploy.prototxt
 state_dict = torch.load(f"models/emonet_{n_expression}.pth", map_location='cpu')
 state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
 net = EmoNet(n_expression=n_expression).to(device)
-net.load_state_dict(state_dict)
+net.load_state_dict(state_dict, strict=False)
 net.eval()
 
 
+def crop_face(img, bb, square=True):
+    (x1, y1, x2, y2) = bb
+    if not square:
+        return img[y1:y2, x1:x2]
+    cx = int((x1 + x2) / 2)
+    cy = int((y1 + y2) / 2)
+    size = max(x2 - x1, y2 - y1)
+    x1 = max(int(cx - size / 2), 0)
+    x2 = x1 + size
+    y1 = max(int(cy - size / 2), 0)
+    y2 = y1 + size
+    return img[y1:y2, x1:x2]
+    # return cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
+
+
 def detect_face(image, min_confidence=0.95):
-    base_img = image.copy()
-    original_size = base_img.shape
     target_size = (300, 300)
     image = cv2.resize(image, target_size)
-    aspect_ratio_x = (original_size[1] / target_size[1])
-    aspect_ratio_y = (original_size[0] / target_size[0])
+    h, w = image.shape[:2]
 
-    blob = cv2.dnn.blobFromImage(image)
+    blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0,
+                                 (300, 300), (104.0, 117.0, 123.0))
     face_detector.setInput(blob)
     detections = face_detector.forward()[0][0]
 
@@ -37,11 +50,9 @@ def detect_face(image, min_confidence=0.95):
     confidence = best_face[2]
     if not (is_face and confidence >= min_confidence):
         return
-    left, top, right, bottom = (best_face[-4:] * 300).astype(int)
-
-    detected_face = base_img[int(top * aspect_ratio_y):int(bottom * aspect_ratio_y),
-                    int(left * aspect_ratio_x):int(right * aspect_ratio_x)]
-    return detected_face
+    bb = best_face[3: 7] * np.array([w, h, w, h])
+    face = crop_face(image, bb=bb.astype("int"))
+    return face
 
 
 def analyze_face(image: np.ndarray) -> dict:
@@ -65,6 +76,6 @@ def facial_analysis_pipeline(image):
     if face is None:
         return data
     data["face_img"] = encode_frame(face)
-    analysis = analyze_face(face)
+    analysis = analyze_face(face[:, :, ::-1])
     data.update(analysis)
     return data

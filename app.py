@@ -18,9 +18,9 @@ def webcam():
     return render_template("webcam.html")
 
 
-@app.route('/upload_video')
-def upload_video():
-    return render_template("upload_video.html")
+@app.route('/video')
+def video():
+    return render_template("video.html")
 
 
 @app.route("/analyze_frame", methods=["POST"])

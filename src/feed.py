@@ -23,6 +23,6 @@ class FrameGenerator(object):
                     continue
                 data["face_img"] = encode_frame(face)
                 if self.analyze_face:
-                    analysis = analyze_face(face)
+                    analysis = analyze_face(face[:, :, ::-1])  # correct colors
                     data.update(analysis)
                 yield data

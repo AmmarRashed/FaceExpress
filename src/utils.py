@@ -1,6 +1,7 @@
 import base64
 
 import cv2
+import numpy as np
 
 
 def encode_frame(frame):
@@ -17,3 +18,5 @@ def draw_face_box(frame, region, crop=True):
         face = frame[y1:y2, x1:x2]
         return frame, face
     return frame
+
+

@@ -1,7 +1,7 @@
 import base64
 
 import cv2
-import numpy as np
+from torch.utils.data import Dataset
 
 
 def encode_frame(frame):
@@ -20,3 +20,12 @@ def draw_face_box(frame, region, crop=True):
     return frame
 
 
+class MyDataset(Dataset):
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]

@@ -6,7 +6,6 @@ from flask import Flask, render_template, jsonify, request
 
 from src.facial_analysis import facial_analysis_pipeline
 from src.feed import FrameGenerator
-from src.utils import encode_frame
 
 app = Flask(__name__)
 
@@ -18,8 +17,12 @@ def webcam():
     return render_template("webcam.html")
 
 
-@app.route('/video')
+@app.route('/video', methods=["POST", "GET"])
 def video():
+    if request.method == "POST":
+        file = request.files["file"]
+        file.save("gameplay")
+        return render_template("video.html")
     return render_template("video.html")
 
 
@@ -38,8 +41,6 @@ def analyze_frame():
 def frames():
     global frame_generator
     video_src = request.args.get("video_src")
-    if video_src == "0":
-        video_src = 0
     if frame_generator.video_src != video_src:
         frame_generator = FrameGenerator(video_src=video_src, analyze_face=True)
 

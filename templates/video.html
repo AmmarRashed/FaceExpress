@@ -8,16 +8,17 @@
     <title>Upload a gameplay recording</title>
 </head>
 <body>
-<input type="file" id="video-file" accept="video/*">
-<div>
-    <video id="video-player" width="640" height="480" controls></video>
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-    <img id="face">
-</div>
-<div class="wrapper">
-    <div id="emotion-div" class="analysis_div">
+<div id="loaded_file">
+    <div>
+        <video id="video-player" width="640" height="480" controls></video>
+        <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+        <img id="face">
     </div>
-    <div id="val-arousal-div" class="analysis_div">
+    <div class="wrapper">
+        <div id="emotion-div" class="analysis_div">
+        </div>
+        <div id="val-arousal-div" class="analysis_div">
+        </div>
     </div>
 </div>
 </body>

@@ -13,6 +13,11 @@ n_expression = 8
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 face_detector = cv2.dnn.readNetFromCaffe(os.path.join("models", 'deploy.prototxt'),
                                          os.path.join("models", 'res10_300x300_ssd_iter_140000.caffemodel'))
+
+if device == "cuda":
+    face_detector.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+    face_detector.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
 state_dict = torch.load(f"models/emonet_{n_expression}.pth", map_location='cpu')
 state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
 net = EmoNet(n_expression=n_expression).to(device)
@@ -55,14 +60,19 @@ def detect_face(image, min_confidence=0.95):
     return face
 
 
-def analyze_face(image: np.ndarray) -> dict:
-    image = cv2.resize(image, (256, 256))
-    image = np.ascontiguousarray(image)
+def clean_face(face):
+    face = cv2.resize(face, (256, 256))
+    face = np.ascontiguousarray(face)
     transform_image = transforms.Compose([transforms.ToTensor()])
-    image = transform_image(image).to(device)
+    face = transform_image(face).to(device)
+    return face
+
+
+def analyze_face(face: np.ndarray) -> dict:
+    face = clean_face(face)
     data = dict()
     with torch.no_grad():
-        out = net(image.unsqueeze(0))
+        out = net(face.unsqueeze(0))
         expr = torch.softmax(out["expression"], dim=1)
         data["emotions"] = dict(zip(EMOTIONS, expr[0].tolist()))
         data["valence"] = out["valence"].item()
@@ -70,12 +80,21 @@ def analyze_face(image: np.ndarray) -> dict:
     return data
 
 
-def facial_analysis_pipeline(image):
+def analyze_faces_batch(faces):
+    faces = [
+        clean_face(face) for face in faces
+    ]
+    data = dict()
+    with torch.no_grad():
+        out = net(faces)
+
+
+def facial_analysis_pipeline(image, encode_img=True):
     data = dict()
     face = detect_face(image)
     if face is None:
         return data
-    data["face_img"] = encode_frame(face)
+    data["face_img"] = encode_frame(face) if encode_img else face
     analysis = analyze_face(face[:, :, ::-1])
     data.update(analysis)
     return data

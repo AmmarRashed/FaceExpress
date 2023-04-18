@@ -1,4 +1,5 @@
 import base64
+import os
 
 import cv2
 import numpy as np
@@ -10,6 +11,7 @@ from src.feed import FrameGenerator
 app = Flask(__name__)
 
 frame_generator = FrameGenerator(video_src=None, analyze_face=True)
+DATASET_ROOT = os.path.join("Engagement", "FaceEngageDataset")
 
 
 @app.route('/webcam')
@@ -46,6 +48,19 @@ def frames():
 
     frame_data = frame_generator.gen_frames().__next__()
     return jsonify(frame_data)
+
+
+@app.route("/_get_user_files", methods=["GET"])
+def get_user_files():
+    user = request.args.get("user")
+    filenames = sorted({'.'.join(f.split(".")[:-1]) for f in os.listdir(os.path.join(DATASET_ROOT, user))
+                        if f.startswith("u")})
+    return filenames
+
+
+@app.route("/samples", methods=["GET"])
+def samples():
+    return render_template("samples.html", users=sorted(os.listdir(DATASET_ROOT), key=lambda x: int(x[1:])))
 
 
 if __name__ == '__main__':

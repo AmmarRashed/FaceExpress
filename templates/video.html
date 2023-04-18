@@ -8,6 +8,8 @@
     <title>Upload a gameplay recording</title>
 </head>
 <body>
+<input type="file" id="video-file" accept="video/*">
+
 <div id="loaded_file">
     <div>
         <video id="video-player" width="640" height="480" controls></video>
@@ -22,5 +24,6 @@
     </div>
 </div>
 </body>
+<script src="{{ url_for('static', filename='plotting_utils.js') }}"></script>
 <script src="{{ url_for('static', filename='video.js') }}"></script>
 </html>

@@ -21,3 +21,9 @@
     box-sizing: border-box;
     padding: 10px;
 }
+
+select {
+    width: 300px; /* Set the width of the dropdown */
+    font-size: 18px; /* Set the font size of the dropdown */
+    height: 40px; /* Set the height of the dropdown */
+}

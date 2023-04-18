@@ -18,14 +18,3 @@ def draw_face_box(frame, region, crop=True):
         face = frame[y1:y2, x1:x2]
         return frame, face
     return frame
-
-
-class MyDataset(Dataset):
-    def __init__(self, data):
-        self.data = data
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        return self.data[idx]

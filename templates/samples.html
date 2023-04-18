@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/styles/index.css">
+    <title>Samples</title>
+</head>
+<body>
+<div>
+    User:
+    <select id="users_dropdown" name="user" class="dropdown-menu">
+        {% for user in users %}
+            <option value="{{ user }}">{{ user }}</option>
+        {% endfor %}
+    </select>
+    Gameplay Segment:
+    <select id="files_dropdown" name="file" class="dropdown-menu">
+    </select>
+</div>
+
+<div id="loaded_file">
+    <div>
+        <video id="video-player" width="640" height="480" controls></video>
+        <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+        <img id="face">
+    </div>
+    <div class="wrapper">
+        <div id="emotion-div" class="analysis_div">
+        </div>
+        <div id="val-arousal-div" class="analysis_div">
+        </div>
+    </div>
+</div>
+
+<button id="loading_btn" onclick="loadFile()">Pause</button>
+
+<script src="{{ url_for('static', filename='plotting_utils.js') }}"></script>
+<script src="{{ url_for('static', filename='samples.js') }}"></script>
+
+</body>
+</html>

@@ -40,9 +40,10 @@ def crop_face(img, bb, square=True):
     # return cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
 
 
-def detect_face(image, min_confidence=0.95):
-    target_size = (300, 300)
-    image = cv2.resize(image, target_size)
+def detect_face(image, min_confidence=0.95, resize=False):
+    if resize:
+        target_size = (300, 300)
+        image = cv2.resize(image, target_size)
     h, w = image.shape[:2]
 
     blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0,
@@ -68,7 +69,20 @@ def clean_face(face):
     return face
 
 
-def analyze_face(face: np.ndarray, keep_landmarks=False) -> dict:
+def get_landmarks_from_heatmap(heatmap, shape):
+    landmarks = []
+    w, h = shape
+    for i in range(heatmap.shape[0]):
+        split = heatmap[i, :, :]
+        max_index = np.argmax(split, axis=None)
+        y, x = np.unravel_index(max_index, split.shape)
+        x = int(x * w / 64)
+        y = int(y * h / 64)
+        landmarks.append((x, y))
+    return np.array(landmarks)
+
+
+def analyze_face(face: np.ndarray, keep_landmarks=False, keep_face=False) -> dict:
     face = clean_face(face)
     data = dict()
     with torch.no_grad():
@@ -77,7 +91,11 @@ def analyze_face(face: np.ndarray, keep_landmarks=False) -> dict:
         data["emotions"] = dict(zip(EMOTIONS, expr[0].tolist()))
         data["valence"] = out["valence"].item()
         data["arousal"] = out["arousal"].item()
-        data["heatmap"] = np.array(out["heatmap"].cpu())
+        if keep_landmarks:
+            heatmap = np.array(out["heatmap"].cpu())[0]
+            data["landmarks"] = get_landmarks_from_heatmap(heatmap, face.shape[1:])
+        if keep_face:
+            data["face"] = np.array(face.transpose(0, 2).transpose(0, 1).cpu())
     return data
 
 

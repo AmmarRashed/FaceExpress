@@ -1,9 +1,7 @@
-import cv2
+from imutils.video import WebcamVideoStream, FileVideoStream
 
 from src.facial_analysis import analyze_face, detect_face
 from src.utils import encode_frame
-import imutils
-from imutils.video import WebcamVideoStream, FileVideoStream
 
 
 class FrameGenerator(object):

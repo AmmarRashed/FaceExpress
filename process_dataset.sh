@@ -8,6 +8,9 @@ find Engagement -name "*.mp4" -type f | while read file; do
   counter=$(($counter + 1))
   perc=$((counter * 100 / file_count))
   echo "Processing file $counter of $file_count [$perc%]: $file"
+  if test -f "${file%.mp4}.pkl"; then
+    continue
+  fi
   python process_video.py "$file"
   if [ $? -ne 0 ]; then
     echo "Error processing file: $file"

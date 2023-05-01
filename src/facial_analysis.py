@@ -68,7 +68,7 @@ def clean_face(face):
     return face
 
 
-def analyze_face(face: np.ndarray) -> dict:
+def analyze_face(face: np.ndarray, keep_landmarks=False) -> dict:
     face = clean_face(face)
     data = dict()
     with torch.no_grad():
@@ -77,6 +77,7 @@ def analyze_face(face: np.ndarray) -> dict:
         data["emotions"] = dict(zip(EMOTIONS, expr[0].tolist()))
         data["valence"] = out["valence"].item()
         data["arousal"] = out["arousal"].item()
+        data["heatmap"] = np.array(out["heatmap"].cpu())
     return data
 
 

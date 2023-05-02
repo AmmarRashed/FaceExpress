@@ -106,3 +106,25 @@ function displayValenceArousal(div, val, arousal) {
     var data = [circle, {mode: 'markers', x: [val], y: [arousal], name: 'Emotion', marker: {color: 'red', size: 16}}]
     Plotly.newPlot(div, data, layout);
 }
+
+
+function displayEyeInfo(div, data) {
+    div.innerHTML = "";
+    const info = document.createElement("ul");
+    // Create three list item elements
+    const pupils = document.createElement("li");
+    pupils.textContent = data.pupils;
+
+    const blinking = document.createElement("li");
+    blinking.textContent = data.blinking;
+
+    const looking = document.createElement("li");
+    looking.textContent = data.looking;
+
+
+    info.appendChild(pupils);
+    info.appendChild(blinking);
+    info.appendChild(looking);
+
+    div.appendChild(info);
+}

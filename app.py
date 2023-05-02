@@ -7,10 +7,12 @@ from flask import Flask, render_template, jsonify, request
 
 from src.facial_analysis import facial_analysis_pipeline
 from src.feed import FrameGenerator
+from src.gaze_tracking.gaze_tracking import GazeTracking
 
 app = Flask(__name__)
 
 frame_generator = FrameGenerator(video_src=None, analyze_face=True)
+gaze_tracker = GazeTracking()
 DATASET_ROOT = os.path.join("Engagement", "FaceEngageDataset")
 
 
@@ -35,7 +37,7 @@ def analyze_frame():
     # convert the decoded image to a numpy array using cv2
     image = np.frombuffer(img_bytes, np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_UNCHANGED)
-    data = facial_analysis_pipeline(image)
+    data = facial_analysis_pipeline(gaze_tracker, image)
     return jsonify(data)
 
 

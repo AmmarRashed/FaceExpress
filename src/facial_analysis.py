@@ -40,10 +40,7 @@ def crop_face(img, bb, square=True):
     # return cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
 
 
-def detect_face(image, min_confidence=0.95, resize=False):
-    if resize:
-        target_size = (300, 300)
-        image = cv2.resize(image, target_size)
+def detect_face(image, min_confidence=0.95):
     h, w = image.shape[:2]
 
     blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0,
@@ -58,6 +55,7 @@ def detect_face(image, min_confidence=0.95, resize=False):
         return
     bb = best_face[3: 7] * np.array([w, h, w, h])
     face = crop_face(image, bb=bb.astype("int"))
+    face = cv2.resize(face, (256, 256))
     return face
 
 
@@ -108,12 +106,37 @@ def analyze_faces_batch(faces):
         out = net(faces)
 
 
-def facial_analysis_pipeline(image, encode_img=True):
+def track_eyes(gaze_tracker, face, landmarks, annotate_face=True):
+    gaze_tracker.refresh(face, landmarks)
+    if annotate_face:
+        face = gaze_tracker.annotated_frame()
+    data = dict()
+    if gaze_tracker.pupils_located:
+        data["blinking"] = "Blinking" if gaze_tracker.is_blinking() else ""
+        if gaze_tracker.is_left():
+            data["looking"] = "Looking LEFT"
+        elif gaze_tracker.is_right():
+            data["looking"] = "Looking RIGHT"
+        elif gaze_tracker.is_center():
+            data["looking"] = "Looking CENTER"
+        lx, ly = gaze_tracker.pupil_left_coords()
+        rx, ry = gaze_tracker.pupil_right_coords()
+        data["pupils"] = f"Left pupil at ({lx}, {ly})\t\tRight pupil at ({rx}, {ry})"
+    else:
+        data["looking"] = ""
+        data["left_pupil"] = data["right_pupil"] = "No pupil detected"
+        data["blinking"] = ""
+    return data, face
+
+
+def facial_analysis_pipeline(gaze_tracker, image, encode_img=True):
     data = dict()
     face = detect_face(image)
     if face is None:
         return data
     data["face_img"] = encode_frame(face) if encode_img else face
-    analysis = analyze_face(face[:, :, ::-1])
+    analysis = analyze_face(face[:, :, ::-1], keep_face=False, keep_landmarks=True)  # correct colors
+    eye_data, face = track_eyes(gaze_tracker, face, analysis.pop("landmarks"))
     data.update(analysis)
+    data.update(eye_data)
     return data

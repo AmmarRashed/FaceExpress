@@ -30,6 +30,7 @@ function processFrame() {
             if (val) {
                 displayValenceArousal('val-arousal-div', val, arousal);
             }
+            displayEyeInfo(eye_div, response);
         });
     // continue processing frames
     window.requestAnimationFrame(processFrame);

@@ -3,6 +3,7 @@ const val_arousal_div = document.getElementById("val-arousal-div");
 const webcam_feed = document.getElementById("webcam-feed");
 const face = document.getElementById("face");
 const pause_btn = document.getElementById("pause-btn");
+const eye_div = document.getElementById("eye-div");
 let pause_state = false;
 let stream_interval;
 
@@ -28,6 +29,8 @@ function get_frame() {
                 displayValenceArousal('val-arousal-div', val, arousal);
             }
             webcam_feed.src = 'data:image/jpeg;base64,' + response.frame;
+
+            displayEyeInfo(eye_div, response);
         },
     })
 

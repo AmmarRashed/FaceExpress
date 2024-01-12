@@ -6,6 +6,11 @@ from .calibration import Calibration
 from .eye import Eye
 
 
+def map_to_original_frame(frame, face_bb):
+    # TODO
+    pass
+
+
 class GazeTracking(object):
     """
     This class tracks the user's gaze.
@@ -36,6 +41,7 @@ class GazeTracking(object):
         """Detects the face and initialize Eye objects"""
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         try:
+            # landmarks = map_to_original_frame(self.frame, self.face_bb)
             self.eye_left = Eye(frame, self.landmarks, 0, self.calibration)
             self.eye_right = Eye(frame, self.landmarks, 1, self.calibration)
 
@@ -43,13 +49,14 @@ class GazeTracking(object):
             self.eye_left = None
             self.eye_right = None
 
-    def refresh(self, frame, landmarks):
+    def refresh(self, frame, landmarks, face_bb=None):
         """Refreshes the frame and analyzes it.
 
         Arguments:
             frame (numpy.ndarray): The frame to analyze
         """
         self.frame = frame
+        self.face_bb = face_bb  # todo
         self.landmarks = landmarks
         self._analyze()
 
@@ -106,8 +113,7 @@ class GazeTracking(object):
         """Returns true if the user closes his eyes"""
         if self.pupils_located:
             blinking_ratio = (self.eye_left.blinking + self.eye_right.blinking) / 2
-            return blinking_ratio > 4
-
+            return blinking_ratio
     def annotated_frame(self):
         """Returns the main frame with pupils highlighted"""
         frame = self.frame.copy()
